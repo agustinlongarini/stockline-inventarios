@@ -1,0 +1,138 @@
+<div th:fragment="contenido" xmlns:th="http://www.w3.org/1999/xhtml">
+    <section class="bg-white p-6 rounded-xl shadow-xl">
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4 sm:mb-0"
+                th:text="'Detalle del artículo: ' + ${articulo.nombreArticulo}">
+                Detalle del artículo
+            </h2>
+            <a th:href="@{/articulo/listado}" class="btn-primary">
+                <i class="fas fa-arrow-left mr-2"></i>Volver
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="space-y-2">
+                <p>
+                    <span class="font-semibold text-gray-700">ID:</span>
+                    <span th:text="${articulo.id}">1</span>
+                </p>
+                <p>
+                    <span class="font-semibold text-gray-700">Nombre:</span>
+                    <span th:text="${articulo.nombreArticulo}">Nombre</span>
+                </p>
+                <p>
+                    <span class="font-semibold text-gray-700">Descripción:</span>
+                    <span th:text="${articulo.descripcionArticulo}">Descripción</span>
+                </p>
+                <p>
+                    <span class="font-semibold text-gray-700">Precio de venta:</span>
+                    $<span th:text="${articulo.precioVenta}">0.00</span>
+                </p>
+                <p>
+                    <span class="font-semibold text-gray-700">Modelo de inventario:</span>
+                    <span th:text="${articulo.modeloInventario}">LoteFijo</span>
+                </p>
+                <p>
+                    <span class="font-semibold text-gray-700">Proveedor predeterminado:</span>
+                    <span th:text="${articulo.proveedorPredeterminado != null ? articulo.proveedorPredeterminado.nombreProveedor : 'Sin asignar'}">
+                        Sin asignar
+                    </span>
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="bg-gray-50 rounded-lg p-4 shadow-sm">
+                    <p class="text-sm text-gray-500 mb-1">Stock actual</p>
+                    <p class="text-3xl font-bold text-gray-800" th:text="${articulo.stockActual}">0</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4 shadow-sm">
+                    <p class="text-sm text-gray-500 mb-1">Estado</p>
+                    <p class="text-lg font-semibold"
+                       th:text="${articulo.fechaBaja == null} ? 'Activo' : 'Inactivo'"></p>
+                    <p class="text-xs text-gray-500 mt-1" th:if="${articulo.fechaBaja != null}">
+                        Dado de baja el <span th:text="${articulo.fechaBaja}">2025-01-01</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-6"/>
+
+        <div class="mb-4 flex items-center justify-between">
+            <h3 class="text-xl font-semibold text-gray-800">
+                Predicción de demanda (últimos 30 días)
+            </h3>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-gray-50 rounded-lg p-4 shadow-sm">
+                <p class="text-sm text-gray-500 mb-1">Demanda diaria promedio</p>
+                <p class="text-2xl font-bold text-gray-800"
+                   th:text="${estadisticasDemanda.demandaPromedioDiaria()}">0</p>
+                <p class="text-xs text-gray-500">unidades / día</p>
+            </div>
+
+            <!-- Días de cobertura -->
+            <div class="bg-gray-50 rounded-lg p-4 shadow-sm">
+                <p class="text-sm text-gray-500 mb-1">Cobertura de stock</p>
+                <p class="text-2xl font-bold text-gray-800"
+                   th:text="${estadisticasDemanda.diasCoberturaStock() == 2147483647 ? '∞' : estadisticasDemanda.diasCoberturaStock()}">
+                    0
+                </p>
+                <p class="text-xs text-gray-500">días estimados con el stock actual</p>
+            </div>
+
+            <div class="bg-gray-50 rounded-lg p-4 shadow-sm">
+                <p class="text-sm text-gray-500 mb-1">Pronóstico próximos 30 días</p>
+                <p class="text-2xl font-bold text-gray-800"
+                   th:text="${estadisticasDemanda.pronostico30Dias()}">0</p>
+                <p class="text-xs text-gray-500">unidades estimadas</p>
+            </div>
+        </div>
+
+        <div class="bg-gray-50 rounded-lg p-4 shadow-sm">
+            <h4 class="text-lg font-semibold text-gray-800 mb-3">Detalle estadístico</h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div>
+                    <p class="text-gray-600">
+                        <span class="font-semibold">Desvío estándar:</span>
+                        <span th:text="${estadisticasDemanda.desviacionEstandar()}">0</span>
+                    </p>
+                </div>
+                <div>
+                    <p class="text-gray-600">
+                        <span class="font-semibold">Días con ventas analizados:</span>
+                        <span th:text="${estadisticasDemanda.diasConVentas()}">0</span>
+                    </p>
+                </div>
+                <div>
+                    <p class="text-gray-600">
+                        <span class="font-semibold">Pronóstico diario (SES):</span>
+                        <span th:text="${estadisticasDemanda.pronosticoDiario()}">0</span>
+                        <span class="text-xs text-gray-500">unidades / día</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-6 flex flex-wrap gap-3 justify-end">
+            <a th:href="@{/articulo/listado}" class="btn-secondary">
+                <i class="fas fa-arrow-left mr-2"></i>Volver al listado
+            </a>
+            <a th:href="@{/articulo/{id}/proveedores(id=${articulo.id})}" class="btn-secondary">
+                <i class="fas fa-boxes-stacked mr-2"></i>Ver proveedores
+            </a>
+            <a th:href="@{/articulo/{id}/CGI/popup(id=${articulo.id})}"
+               onclick="event.preventDefault(); abrirModalCGI(this.getAttribute('href'))"
+               class="btn-secondary">
+                <i class="fas fa-chart-line mr-2"></i>Ver CGI
+            </a>
+        </div>
+
+        <div id="cgiModal" class="fixed inset-0 hidden bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-xl p-6 shadow-xl w-[28rem]" id="cgiModalContent"></div>
+        </div>
+
+        <script th:src="@{/js/articulos.js}"></script>
+
+</div>

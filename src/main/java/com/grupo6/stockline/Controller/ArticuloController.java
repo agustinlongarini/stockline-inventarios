@@ -1,12 +1,14 @@
 package com.grupo6.stockline.Controller;
+
 import com.grupo6.stockline.Entities.Articulo;
 import com.grupo6.stockline.Entities.ArticuloProveedor;
 import com.grupo6.stockline.Entities.DatosModeloInventario;
 import com.grupo6.stockline.Enum.ModeloInventario;
 import com.grupo6.stockline.Service.ArticuloProveedorService;
 import com.grupo6.stockline.Service.ArticuloService;
-import com.grupo6.stockline.Service.ProveedorService;
 import com.grupo6.stockline.Service.DatosModeloInventarioService;
+import com.grupo6.stockline.Service.ServicioPrediccionDemanda;
+import com.grupo6.stockline.Service.ProveedorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("articulo")
@@ -27,7 +28,7 @@ public class ArticuloController{
     private final ProveedorService proveedorService;
     private final ArticuloProveedorService articuloProveedorService;
     private final DatosModeloInventarioService datosModeloInventarioService;
-
+    private final ServicioPrediccionDemanda servicioPrediccionDemanda; // ⬅️ NUEVO
 
     @GetMapping("/crear")
     public String mostrarFormularioArticulo(Model model) throws Exception{
@@ -40,7 +41,6 @@ public class ArticuloController{
         model.addAttribute("articulo", articulo);
         model.addAttribute("contenido", "articulos/formArticulo :: contenido");
         model.addAttribute("isEditMode", false);
-
 
         return "layouts/base";
     }
@@ -199,4 +199,15 @@ public class ArticuloController{
         return "redirect:/articulo/listado";
     }
 
+    @GetMapping("/{id}/detalle")
+    public String verDetalleArticulo(@PathVariable Long id, Model model) throws Exception {
+        Articulo articulo = articuloService.findById(id);
+        var estadisticasDemanda = servicioPrediccionDemanda.obtenerEstadisticas(id);
+
+        model.addAttribute("articulo", articulo);
+        model.addAttribute("estadisticasDemanda", estadisticasDemanda);
+        model.addAttribute("contenido", "articulos/detalleArticulo :: contenido");
+
+        return "layouts/base";
+    }
 }

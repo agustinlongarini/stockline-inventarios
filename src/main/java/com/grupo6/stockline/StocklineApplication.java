@@ -1,7 +1,6 @@
 package com.grupo6.stockline;
 
 import com.grupo6.stockline.Entities.*;
-import com.grupo6.stockline.Enum.EstadoOrdenCompra;
 import com.grupo6.stockline.Enum.ModeloInventario;
 import com.grupo6.stockline.Repositories.*;
 import org.springframework.boot.CommandLineRunner;
@@ -10,7 +9,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @SpringBootApplication
@@ -21,318 +23,268 @@ public class StocklineApplication {
 		SpringApplication.run(StocklineApplication.class, args);
 	}
 
-	/*@Bean
-	public CommandLineRunner cargarDatosDePrueba(ArticuloRepository articuloRepo,
-												 ProveedorRepository proveedorRepo,
-												 OrdenCompraRepository ordenCompraRepo,
-												 VentaRepository ventaRepo,
-												 DetalleOrdenCompraRepository detalleOCRepo,
-												 DetalleVentaRepository detalleVentaRepo,
-												 ArticuloProveedorRepository articuloProveedorRepo,
-												 DatosModeloInventarioRepository datosModeloRepo) {
+	@Bean
+	public CommandLineRunner cargarDatosDePruebaCompleto(ArticuloRepository articuloRepo,
+														 ProveedorRepository proveedorRepo,
+														 VentaRepository ventaRepo,
+														 DetalleVentaRepository detalleVentaRepo,
+														 ArticuloProveedorRepository articuloProveedorRepo,
+														 DatosModeloInventarioRepository datosModeloRepo) {
 		return args -> {
 
-			// ==================================================================
+			if (ventaRepo.count() > 0) {
+				return;
+			}
+
+			System.out.println("===== CARGANDO DATOS DE PRUEBA COMPLETOS =====");
+
+			LocalDateTime ahora = LocalDateTime.now();
+
+			// =========================================================
 			// PROVEEDORES
-			// ==================================================================
+			// =========================================================
 			Proveedor proveedor1 = new Proveedor();
-			proveedor1.setNombreProveedor("TechZone S.A.");
-			proveedor1.setMailProveedor("contacto@techzone.com");
-			proveedor1.setFechaAlta(LocalDate.now());
+			proveedor1.setNombreProveedor("Ferretería Central");
+			proveedor1.setMailProveedor("contacto@ferreteriacentral.com");
+			proveedor1.setFechaAlta(ahora.minusDays(120));
 			proveedorRepo.save(proveedor1);
 
 			Proveedor proveedor2 = new Proveedor();
-			proveedor2.setNombreProveedor("Distribuidora Central");
-			proveedor2.setMailProveedor("ventas@dcentral.com");
-			proveedor2.setFechaAlta(LocalDate.now());
+			proveedor2.setNombreProveedor("Mayorista Norte");
+			proveedor2.setMailProveedor("ventas@mayoristanorte.com");
+			proveedor2.setFechaAlta(ahora.minusDays(90));
 			proveedorRepo.save(proveedor2);
 
-			Proveedor proveedor3 = new Proveedor();
-			proveedor3.setNombreProveedor("Insumos GAMER SRL");
-			proveedor3.setMailProveedor("pedidos@insumosgamer.com.ar");
-			proveedor3.setFechaAlta(LocalDate.now());
-			proveedorRepo.save(proveedor3);
-
-			// ==================================================================
+			// =========================================================
 			// ARTÍCULOS
-			// ==================================================================
-			Articulo articulo1 = new Articulo();
-			articulo1.setNombreArticulo("Monitor Samsung 24\"");
-			articulo1.setDescripcionArticulo("Monitor LED 24 pulgadas Full HD 75Hz");
-			articulo1.setCostoCompra(185000);
-			articulo1.setCostoAlmacenamiento(950);
-			articulo1.setCostoPedido(5000);
-			articulo1.setDemandaArticulo(40);
-			articulo1.setStockActual(10);
-			articulo1.setModeloInventario(ModeloInventario.LoteFijo);
-			articulo1.setFechaModificacionArticulo(LocalDate.now());
-			articulo1.setProveedorPredeterminado(proveedor1);
-			articulo1.setFechaAlta(LocalDate.now());
-			articuloRepo.save(articulo1);
+			// =========================================================
 
-			Articulo articulo2 = new Articulo();
-			articulo2.setNombreArticulo("Teclado Mecánico Redragon");
-			articulo2.setDescripcionArticulo("Teclado gamer retroiluminado RGB, switch blue");
-			articulo2.setCostoCompra(75000);
-			articulo2.setCostoAlmacenamiento(600);
-			articulo2.setCostoPedido(2500);
-			articulo2.setDemandaArticulo(70);
-			articulo2.setStockActual(25);
-			articulo2.setModeloInventario(ModeloInventario.IntervaloFijo);
-			articulo2.setFechaModificacionArticulo(LocalDate.now());
-			articulo2.setProveedorPredeterminado(proveedor3);
-			articulo2.setFechaAlta(LocalDate.now());
-			articuloRepo.save(articulo2);
+			// Artículo 1: Martillo - tendencia creciente + pico fines de semana
+			Articulo martillo = new Articulo();
+			martillo.setNombreArticulo("Martillo de acero");
+			martillo.setDescripcionArticulo("Martillo de acero forjado con mango de goma");
+			martillo.setCostoAlmacenamiento(50);
+			martillo.setDemandaArticulo(90);
+			martillo.setStockActual(500);
+			martillo.setPrecioVenta(5000.0);
+			martillo.setProveedorPredeterminado(proveedor1);
+			martillo.setModeloInventario(ModeloInventario.LoteFijo);
+			martillo.setFechaAlta(ahora.minusDays(120));
+			martillo.setFechaUltimaRevision(ahora.minusDays(30));
+			martillo.setTiempoRevision(30);
+			articuloRepo.save(martillo);
 
-			Articulo articulo3 = new Articulo();
-			articulo3.setNombreArticulo("Mouse Logitech G203");
-			articulo3.setDescripcionArticulo("Mouse inalámbrico ergonómico Lightspeed");
-			articulo3.setCostoCompra(48000);
-			articulo3.setCostoAlmacenamiento(400);
-			articulo3.setCostoPedido(2000);
-			articulo3.setDemandaArticulo(60);
-			articulo3.setStockActual(5);
-			articulo3.setModeloInventario(ModeloInventario.LoteFijo);
-			articulo3.setFechaModificacionArticulo(LocalDate.now());
-			articulo3.setProveedorPredeterminado(proveedor2);
-			articulo3.setFechaAlta(LocalDate.now());
-			articuloRepo.save(articulo3);
+			// Artículo 2: Destornillador - demanda estable, leve efecto finde
+			Articulo destornillador = new Articulo();
+			destornillador.setNombreArticulo("Destornillador punta plana");
+			destornillador.setDescripcionArticulo("Destornillador de acero cromo vanadio");
+			destornillador.setCostoAlmacenamiento(30);
+			destornillador.setDemandaArticulo(60);
+			destornillador.setStockActual(400);
+			destornillador.setPrecioVenta(2500.0);
+			destornillador.setProveedorPredeterminado(proveedor2);
+			destornillador.setModeloInventario(ModeloInventario.LoteFijo);
+			destornillador.setFechaAlta(ahora.minusDays(120));
+			destornillador.setFechaUltimaRevision(ahora.minusDays(30));
+			destornillador.setTiempoRevision(30);
+			articuloRepo.save(destornillador);
 
-			Articulo articulo4 = new Articulo();
-			articulo4.setNombreArticulo("Webcam Logitech C920");
-			articulo4.setDescripcionArticulo("Webcam Full HD 1080p con micrófono");
-			articulo4.setCostoCompra(95000);
-			articulo4.setCostoAlmacenamiento(350);
-			articulo4.setCostoPedido(4000);
-			articulo4.setDemandaArticulo(25);
-			articulo4.setStockActual(15);
-			articulo4.setModeloInventario(ModeloInventario.IntervaloFijo);
-			articulo4.setFechaModificacionArticulo(LocalDate.now());
-			articulo4.setProveedorPredeterminado(proveedor2);
-			articulo4.setFechaAlta(LocalDate.now());
-			articuloRepo.save(articulo4);
+			// Artículo 3: Taladro - demanda muy estacional (sube mucho el finde)
+			Articulo taladro = new Articulo();
+			taladro.setNombreArticulo("Taladro percutor 750W");
+			taladro.setDescripcionArticulo("Taladro percutor 750W con maletín y accesorios");
+			taladro.setCostoAlmacenamiento(80);
+			taladro.setDemandaArticulo(50);
+			taladro.setStockActual(300);
+			taladro.setPrecioVenta(9000.0);
+			taladro.setProveedorPredeterminado(proveedor1);
+			taladro.setModeloInventario(ModeloInventario.LoteFijo);
+			taladro.setFechaAlta(ahora.minusDays(120));
+			taladro.setFechaUltimaRevision(ahora.minusDays(30));
+			taladro.setTiempoRevision(30);
+			articuloRepo.save(taladro);
 
-			Articulo articulo5 = new Articulo();
-			articulo5.setNombreArticulo("Auriculares HyperX Cloud II");
-			articulo5.setDescripcionArticulo("Auriculares gamer 7.1 con micrófono desmontable");
-			articulo5.setCostoCompra(120000);
-			articulo5.setCostoAlmacenamiento(750);
-			articulo5.setCostoPedido(5000);
-			articulo5.setDemandaArticulo(30);
-			articulo5.setStockActual(22);
-			articulo5.setModeloInventario(ModeloInventario.LoteFijo);
-			articulo5.setFechaModificacionArticulo(LocalDate.now());
-			articulo5.setProveedorPredeterminado(proveedor3);
-			articulo5.setFechaAlta(LocalDate.now());
-			articuloRepo.save(articulo5);
+			// =========================================================
+			// ARTICULO - PROVEEDOR (ArticuloProveedor)
+			// =========================================================
 
-
-			// ==================================================================
-			// ARTÍCULO - PROVEEDOR (usando setters)
-			// ==================================================================
+			// Martillo comprado a ambos proveedores
 			ArticuloProveedor ap1 = new ArticuloProveedor();
+			ap1.setArticulo(martillo);
 			ap1.setProveedor(proveedor1);
-			ap1.setArticulo(articulo1);
-			ap1.setPrecioArticulo(184500.0);
+			ap1.setCostoCompra(4200.0);
+			ap1.setCostoPedido(800.0);
 			ap1.setDemoraEntrega(5);
-			ap1.setCargoPedido(5000);
-			ap1.setFechaAlta(LocalDate.now());
+			ap1.setFechaAlta(ahora.minusDays(60));
 			articuloProveedorRepo.save(ap1);
 
 			ArticuloProveedor ap2 = new ArticuloProveedor();
+			ap2.setArticulo(martillo);
 			ap2.setProveedor(proveedor2);
-			ap2.setArticulo(articulo1);
-			ap2.setPrecioArticulo(186000.0);
-			ap2.setDemoraEntrega(7);
-			ap2.setCargoPedido(5500);
-			ap2.setFechaAlta(LocalDate.now());
+			ap2.setCostoCompra(4100.0);
+			ap2.setCostoPedido(1200.0);
+			ap2.setDemoraEntrega(8);
+			ap2.setFechaAlta(ahora.minusDays(45));
 			articuloProveedorRepo.save(ap2);
 
+			// Destornillador solo proveedor2
 			ArticuloProveedor ap3 = new ArticuloProveedor();
-			ap3.setProveedor(proveedor3);
-			ap3.setArticulo(articulo2);
-			ap3.setPrecioArticulo(74500.0);
-			ap3.setDemoraEntrega(3);
-			ap3.setCargoPedido(2500);
-			ap3.setFechaAlta(LocalDate.now());
+			ap3.setArticulo(destornillador);
+			ap3.setProveedor(proveedor2);
+			ap3.setCostoCompra(1800.0);
+			ap3.setCostoPedido(600.0);
+			ap3.setDemoraEntrega(4);
+			ap3.setFechaAlta(ahora.minusDays(50));
 			articuloProveedorRepo.save(ap3);
 
+			// Taladro sólo proveedor1
 			ArticuloProveedor ap4 = new ArticuloProveedor();
+			ap4.setArticulo(taladro);
 			ap4.setProveedor(proveedor1);
-			ap4.setArticulo(articulo2);
-			ap4.setPrecioArticulo(75500.0);
-			ap4.setDemoraEntrega(6);
-			ap4.setCargoPedido(2800);
-			ap4.setFechaAlta(LocalDate.now());
+			ap4.setCostoCompra(7200.0);
+			ap4.setCostoPedido(1500.0);
+			ap4.setDemoraEntrega(7);
+			ap4.setFechaAlta(ahora.minusDays(40));
 			articuloProveedorRepo.save(ap4);
 
-			ArticuloProveedor ap5 = new ArticuloProveedor();
-			ap5.setProveedor(proveedor2);
-			ap5.setArticulo(articulo3);
-			ap5.setPrecioArticulo(47800.0);
-			ap5.setDemoraEntrega(4);
-			ap5.setCargoPedido(2000);
-			ap5.setFechaAlta(LocalDate.now());
-			articuloProveedorRepo.save(ap5);
+			// =========================================================
+			// DATOS MODELO DE INVENTARIO
+			// =========================================================
 
-			ArticuloProveedor ap6 = new ArticuloProveedor();
-			ap6.setProveedor(proveedor3);
-			ap6.setArticulo(articulo3);
-			ap6.setPrecioArticulo(48200.0);
-			ap6.setDemoraEntrega(5);
-			ap6.setCargoPedido(2200);
-			ap6.setFechaAlta(LocalDate.now());
-			articuloProveedorRepo.save(ap6);
+			DatosModeloInventario dmiMartillo = new DatosModeloInventario();
+			dmiMartillo.setArticulo(martillo);
+			dmiMartillo.setModeloInventario(ModeloInventario.LoteFijo);
+			dmiMartillo.setInventarioMaximo(600);         // stock máximo deseado
+			dmiMartillo.setLoteOptimo(150);               // lote ideal de compra
+			dmiMartillo.setPuntoPedido(200);              // dispara OC automática
+			dmiMartillo.setStockSeguridad(80);            // para cubrir picos y variación
+			dmiMartillo.setFechaAlta(ahora.minusDays(90));
+			datosModeloRepo.save(dmiMartillo);
 
-			ArticuloProveedor ap7 = new ArticuloProveedor();
-			ap7.setProveedor(proveedor2);
-			ap7.setArticulo(articulo4);
-			ap7.setPrecioArticulo(94000.0);
-			ap7.setDemoraEntrega(8);
-			ap7.setCargoPedido(4000);
-			ap7.setFechaAlta(LocalDate.now());
-			articuloProveedorRepo.save(ap7);
+			DatosModeloInventario dmiDest = new DatosModeloInventario();
+			dmiDest.setArticulo(destornillador);
+			dmiDest.setModeloInventario(ModeloInventario.LoteFijo);
+			dmiDest.setInventarioMaximo(400);
+			dmiDest.setLoteOptimo(100);
+			dmiDest.setPuntoPedido(120);
+			dmiDest.setStockSeguridad(50);
+			dmiDest.setFechaAlta(ahora.minusDays(90));
+			datosModeloRepo.save(dmiDest);
 
-			ArticuloProveedor ap8 = new ArticuloProveedor();
-			ap8.setProveedor(proveedor3);
-			ap8.setArticulo(articulo5);
-			ap8.setPrecioArticulo(119500.0);
-			ap8.setDemoraEntrega(2);
-			ap8.setCargoPedido(5000);
-			ap8.setFechaAlta(LocalDate.now());
-			articuloProveedorRepo.save(ap8);
+			DatosModeloInventario dmiTaladro = new DatosModeloInventario();
+			dmiTaladro.setArticulo(taladro);
+			dmiTaladro.setModeloInventario(ModeloInventario.LoteFijo);
+			dmiTaladro.setInventarioMaximo(300);
+			dmiTaladro.setLoteOptimo(70);
+			dmiTaladro.setPuntoPedido(100);
+			dmiTaladro.setStockSeguridad(40);
+			dmiTaladro.setFechaAlta(ahora.minusDays(90));
+			datosModeloRepo.save(dmiTaladro);
 
-			ArticuloProveedor ap9 = new ArticuloProveedor();
-			ap9.setProveedor(proveedor1);
-			ap9.setArticulo(articulo5);
-			ap9.setPrecioArticulo(121000.0);
-			ap9.setDemoraEntrega(5);
-			ap9.setCargoPedido(5200);
-			ap9.setFechaAlta(LocalDate.now());
-			articuloProveedorRepo.save(ap9);
+			// =========================================================
+			// VENTAS DIARIAS DE LOS ÚLTIMOS 90 DÍAS
+			// =========================================================
 
+			java.util.Random random = new java.util.Random(42);
+			LocalDate fechaInicio = LocalDate.now().minusDays(89);   // 90 días contando hoy
+			LocalTime horaVenta = LocalTime.of(10, 0);
 
-			// ==================================================================
-			// DATOS MODELO INVENTARIO
-			// ==================================================================
-			List<Articulo> articulos = List.of(articulo1, articulo2, articulo3, articulo4, articulo5);
-			for (Articulo art : articulos) {
-				DatosModeloInventario datos = new DatosModeloInventario();
-				datos.setArticulo(art);
-				datos.setInventarioMaximo(art.getStockActual() * 3);
-				datos.setLoteOptimo(art.getDemandaArticulo() / 2);
-				datos.setPuntoPedido( (int) (art.getStockActual() * 0.75) );
-				datos.setStockSeguridad( (int) (art.getStockActual() * 0.25) );
-				datos.setModeloInventario(art.getModeloInventario());
-				datos.setFechaAlta(LocalDate.now());
-				datosModeloRepo.save(datos);
+			for (int i = 0; i < 90; i++) {
+
+				LocalDate fecha = fechaInicio.plusDays(i);
+				LocalDateTime fechaVenta = LocalDateTime.of(fecha, horaVenta);
+				DayOfWeek diaSemana = fecha.getDayOfWeek();
+
+				Venta ventaDia = new Venta();
+				ventaDia.setFechaAlta(fechaVenta);
+				ventaDia.setTotalVenta(0.0);
+				ventaRepo.save(ventaDia);
+
+				double totalDia = 0.0;
+
+				// -------------------------
+				// Demanda MARTILLO
+				// Tendencia creciente + finde
+				// -------------------------
+				int baseMartillo = 2 + (i / 15); // va subiendo cada ~15 días
+				int extraFindeMartillo = (diaSemana == DayOfWeek.SATURDAY || diaSemana == DayOfWeek.SUNDAY) ? 3 : 0;
+				int ruidoMartillo = random.nextInt(3) - 1; // -1, 0 o +1
+				int demandaMartillo = Math.max(0, baseMartillo + extraFindeMartillo + ruidoMartillo);
+
+				demandaMartillo = Math.min(demandaMartillo, martillo.getStockActual());
+				if (demandaMartillo > 0) {
+					DetalleVenta dvMartillo = new DetalleVenta();
+					dvMartillo.setVenta(ventaDia);
+					dvMartillo.setArticulo(martillo);
+					dvMartillo.setCantidad(demandaMartillo);
+					double subTotal = demandaMartillo * martillo.getPrecioVenta();
+					dvMartillo.setSubTotal(subTotal);
+					dvMartillo.setFechaAlta(fechaVenta);
+					detalleVentaRepo.save(dvMartillo);
+
+					totalDia += subTotal;
+					martillo.setStockActual(martillo.getStockActual() - demandaMartillo);
+				}
+
+				// -------------------------
+				// Demanda DESTORNILLADOR
+				// Estable + leve finde
+				// -------------------------
+				int baseDest = 2;
+				int extraFindeDest = (diaSemana == DayOfWeek.SATURDAY || diaSemana == DayOfWeek.SUNDAY) ? 1 : 0;
+				int ruidoDest = random.nextInt(3) - 1;
+				int demandaDest = Math.max(0, baseDest + extraFindeDest + ruidoDest);
+
+				demandaDest = Math.min(demandaDest, destornillador.getStockActual());
+				if (demandaDest > 0) {
+					DetalleVenta dvDest = new DetalleVenta();
+					dvDest.setVenta(ventaDia);
+					dvDest.setArticulo(destornillador);
+					dvDest.setCantidad(demandaDest);
+					double subTotal = demandaDest * destornillador.getPrecioVenta();
+					dvDest.setSubTotal(subTotal);
+					dvDest.setFechaAlta(fechaVenta);
+					detalleVentaRepo.save(dvDest);
+
+					totalDia += subTotal;
+					destornillador.setStockActual(destornillador.getStockActual() - demandaDest);
+				}
+
+				// -------------------------
+				// Demanda TALADRO
+				// Muy alta fines de semana, baja en semana
+				// -------------------------
+				int baseTaladro = 0;
+				int extraFindeTaladro = (diaSemana == DayOfWeek.SATURDAY || diaSemana == DayOfWeek.SUNDAY) ? 5 : 0;
+				int ruidoTaladro = random.nextInt(3) - 1;
+				int demandaTaladro = Math.max(0, baseTaladro + extraFindeTaladro + ruidoTaladro);
+
+				demandaTaladro = Math.min(demandaTaladro, taladro.getStockActual());
+				if (demandaTaladro > 0) {
+					DetalleVenta dvTaladro = new DetalleVenta();
+					dvTaladro.setVenta(ventaDia);
+					dvTaladro.setArticulo(taladro);
+					dvTaladro.setCantidad(demandaTaladro);
+					double subTotal = demandaTaladro * taladro.getPrecioVenta();
+					dvTaladro.setSubTotal(subTotal);
+					dvTaladro.setFechaAlta(fechaVenta);
+					detalleVentaRepo.save(dvTaladro);
+
+					totalDia += subTotal;
+					taladro.setStockActual(taladro.getStockActual() - demandaTaladro);
+				}
+
+				ventaDia.setTotalVenta(totalDia);
+				ventaRepo.save(ventaDia);
 			}
 
-			// ==================================================================
-			// ORDENES DE COMPRA + DETALLES (usando setters)
-			// ==================================================================
-			OrdenCompra orden1 = new OrdenCompra();
-			orden1.setProveedor(proveedor1);
-			orden1.setFechaModificacionOrdenCompra(LocalDate.now());
-			orden1.setEstadoOrdenCompra(EstadoOrdenCompra.Pendiente);
-			orden1.setFechaAlta(LocalDate.now().minusDays(2));
-			ordenCompraRepo.save(orden1);
+			articuloRepo.save(martillo);
+			articuloRepo.save(destornillador);
+			articuloRepo.save(taladro);
 
-			DetalleOrdenCompra doc1 = new DetalleOrdenCompra();
-			doc1.setOrdenCompra(orden1);
-			doc1.setArticulo(articulo1);
-			doc1.setCantidad(20);
-			doc1.setFechaAlta(LocalDate.now());
-			detalleOCRepo.save(doc1);
-
-			DetalleOrdenCompra doc2 = new DetalleOrdenCompra();
-			doc2.setOrdenCompra(orden1);
-			doc2.setArticulo(articulo2);
-			doc2.setCantidad(10);
-			doc2.setFechaAlta(LocalDate.now());
-			detalleOCRepo.save(doc2);
-
-			OrdenCompra orden2 = new OrdenCompra();
-			orden2.setProveedor(proveedor2);
-			orden2.setFechaModificacionOrdenCompra(LocalDate.now());
-			orden2.setEstadoOrdenCompra(EstadoOrdenCompra.Enviada);
-			orden2.setFechaAlta(LocalDate.now().minusDays(5));
-			ordenCompraRepo.save(orden2);
-
-			DetalleOrdenCompra doc3 = new DetalleOrdenCompra();
-			doc3.setOrdenCompra(orden2);
-			doc3.setArticulo(articulo3);
-			doc3.setCantidad(15);
-			doc3.setFechaAlta(LocalDate.now());
-			detalleOCRepo.save(doc3);
-
-			OrdenCompra orden3 = new OrdenCompra();
-			orden3.setProveedor(proveedor3);
-			orden3.setFechaModificacionOrdenCompra(LocalDate.now());
-			orden3.setEstadoOrdenCompra(EstadoOrdenCompra.Finalizada);
-			orden3.setFechaAlta(LocalDate.now().minusDays(10));
-			ordenCompraRepo.save(orden3);
-
-			DetalleOrdenCompra doc4 = new DetalleOrdenCompra();
-			doc4.setOrdenCompra(orden3);
-			doc4.setArticulo(articulo5);
-			doc4.setCantidad(30);
-			doc4.setFechaAlta(LocalDate.now());
-			detalleOCRepo.save(doc4);
-
-			// ==================================================================
-			// VENTAS + DETALLES (usando setters)
-			// ==================================================================
-			Venta venta1 = new Venta();
-			venta1.setTotalVenta(479000);
-			venta1.setFechaAlta(LocalDate.now().minusDays(1));
-			ventaRepo.save(venta1);
-
-			DetalleVenta dv1 = new DetalleVenta();
-			dv1.setVenta(venta1);
-			dv1.setArticulo(articulo1);
-			dv1.setCantidad(2);
-			dv1.setSubTotal(370000);
-			dv1.setFechaAlta(LocalDate.now());
-			detalleVentaRepo.save(dv1);
-
-			DetalleVenta dv2 = new DetalleVenta();
-			dv2.setVenta(venta1);
-			dv2.setArticulo(articulo2);
-			dv2.setCantidad(1);
-			dv2.setSubTotal(75000);
-			dv2.setFechaAlta(LocalDate.now());
-			detalleVentaRepo.save(dv2);
-
-			Venta venta2 = new Venta();
-			venta2.setTotalVenta(459500);
-			venta2.setFechaAlta(LocalDate.now());
-			ventaRepo.save(venta2);
-
-			DetalleVenta dv3 = new DetalleVenta();
-			dv3.setVenta(venta2);
-			dv3.setArticulo(articulo4);
-			dv3.setCantidad(3);
-			dv3.setSubTotal(285000);
-			dv3.setFechaAlta(LocalDate.now());
-			detalleVentaRepo.save(dv3);
-
-			DetalleVenta dv4 = new DetalleVenta();
-			dv4.setVenta(venta2);
-			dv4.setArticulo(articulo5);
-			dv4.setCantidad(1);
-			dv4.setSubTotal(120000);
-			dv4.setFechaAlta(LocalDate.now());
-			detalleVentaRepo.save(dv4);
-
-			DetalleVenta dv5 = new DetalleVenta();
-			dv5.setVenta(venta2);
-			dv5.setArticulo(articulo3);
-			dv5.setCantidad(1);
-			dv5.setSubTotal(48000);
-			dv5.setFechaAlta(LocalDate.now());
-			detalleVentaRepo.save(dv5);
+			System.out.println("===== DATOS DE PRUEBA COMPLETOS CARGADOS =====");
 		};
-	}*/
+	}
+
 
 }

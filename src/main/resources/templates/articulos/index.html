@@ -46,27 +46,37 @@
                     <td th:text="${articulo.modeloInventario}" class="px-4 py-2"></td>
                     <td th:text="${articulo.proveedorPredeterminado?.nombreProveedor}" class="px-4 py-2"></td>
                     <td class="px-4 py-2 flex justify-center gap-2">
+                        <!-- Editar -->
                         <a th:href="@{/articulo/{id}/modificar(id=${articulo.id})}" class="action-icon action-icon-edit">
                             <i class="fas fa-edit"></i>
                         </a>
+                        <!-- Eliminar -->
                         <a href="#"
                            th:attr="data-id=${articulo.id}, data-path='articulo'"
                            onclick="abrirModal(this, event)"
                            class="action-icon action-icon-delete">
                             <i class="fas fa-trash"></i>
                         </a>
+                        <!-- Proveedores -->
                         <a th:href="@{/articulo/{id}/proveedores(id=${articulo.id})}" class="action-icon action-icon-details">
                             <i class="fas fa-boxes-stacked fa-fw"></i>
                         </a>
-                        <!-- Botón Ver CGI -->
+                        <!-- Ver Detalle (nuevo botón) -->
+                        <a th:href="@{/articulo/{id}/detalle(id=${articulo.id})}"
+                           class="action-icon text-green-600 hover:text-green-800"
+                           title="Ver detalle del artículo">
+                            <i class="fas fa-circle-info"></i>
+                        </a>
+                        <!-- Ver CGI -->
                         <a th:href="@{/articulo/{id}/CGI/popup(id=${articulo.id})}"
                            onclick="event.preventDefault(); abrirModalCGI(this.getAttribute('href'))"
                            class="action-icon text-blue-600 hover:text-blue-800" title="Ver CGI">
                             <i class="fas fa-chart-line"></i>
                         </a>
-                        <!-- Botón Ajuste Stock -->
+                        <!-- Ajuste Stock -->
                         <button th:onclick="'abrirModalAjuste(' + ${articulo.id} + ')'"
-                                class="action-icon text-yellow-600 hover:text-yellow-800" title="Ajustar Stock">
+                                class="action-icon text-yellow-600 hover:text-yellow-800"
+                                title="Ajustar Stock">
                             <i class="fas fa-minus-circle"></i>
                         </button>
                     </td>
